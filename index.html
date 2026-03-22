@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f0f1a" />
+    <title>SlideForge — Edit, OCR & Export Presentations in Your Browser</title>
+    <meta name="description" content="Free browser-based presentation editor. Upload PDFs, detect text with OCR, erase and inpaint regions, then export to editable PPTX — all offline, no server required." />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SlideForge — Edit, OCR & Export Presentations in Your Browser" />
+    <meta property="og:description" content="Free browser-based presentation editor with OCR, inpainting, and PPTX export. Runs entirely in your browser." />
+    <meta property="og:site_name" content="SlideForge" />
+    <meta property="og:url" content="https://slideforge.aws.xin/" />
+    <meta property="og:image" content="https://slideforge.aws.xin/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <link rel="canonical" href="https://slideforge.aws.xin/" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SlideForge — Edit, OCR & Export Presentations in Your Browser" />
+    <meta name="twitter:description" content="Free browser-based presentation editor with OCR, inpainting, and PPTX export." />
+    <meta name="twitter:image" content="https://slideforge.aws.xin/og-image.png" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "SlideForge",
+      "description": "Free browser-based PDF to PowerPoint converter with OCR text detection, AI inpainting, and PPTX export. Works entirely offline.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "browserRequirements": "Requires a modern browser with WebAssembly support",
+      "featureList": "OCR text detection, PDF import, PPTX export, AI inpainting, offline processing"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is SlideForge really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, completely free with no account required. No watermarks, no limits." } },
+        { "@type": "Question", "name": "Do my files get uploaded?", "acceptedAnswer": { "@type": "Answer", "text": "No. All processing happens 100% locally in your browser." } },
+        { "@type": "Question", "name": "Does it work offline?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, after the initial AI model download. Models are cached for future use." } },
+        { "@type": "Question", "name": "What formats are supported?", "acceptedAnswer": { "@type": "Answer", "text": "PDF, PNG, JPG, and WebP for input. Export is to PPTX format." } },
+        { "@type": "Question", "name": "Which OCR engines are available?", "acceptedAnswer": { "@type": "Answer", "text": "PaddleOCR (best accuracy) and Tesseract. Both run as WebAssembly." } }
+      ]
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
