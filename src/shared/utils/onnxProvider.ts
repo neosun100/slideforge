@@ -25,14 +25,14 @@ export async function detectWebGPU(): Promise<boolean> {
 /** Get the best available execution provider: webgpu > wasm */
 export async function getBestProvider(): Promise<string> {
   if (cachedProvider) return cachedProvider;
-  const hasWebGPU = await detectWebGPU();
-  cachedProvider = hasWebGPU ? 'webgpu' : 'wasm';
-  log.info(`ONNX provider: ${cachedProvider}${hasWebGPU ? ' (GPU accelerated)' : ''}`);
+  // WebGPU has incomplete operator support (e.g. MaxPool ceil_mode).
+  // Default to WASM which supports all ONNX operators.
+  cachedProvider = 'wasm';
+  log.info('ONNX provider: wasm');
   return cachedProvider;
 }
 
-/** Get execution providers array for ONNX session creation (with fallback) */
+/** Get execution providers array for ONNX session creation */
 export async function getExecutionProviders(): Promise<string[]> {
-  const best = await getBestProvider();
-  return best === 'webgpu' ? ['webgpu', 'wasm'] : ['wasm'];
+  return ['wasm'];
 }

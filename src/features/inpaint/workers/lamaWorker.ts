@@ -27,13 +27,8 @@ async function ensureSession(onProgress?: (msg: string) => void) {
   ort.env.wasm.numThreads = 1;
   ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.3/dist/';
 
-  // Detect WebGPU in worker context
-  let eps: string[] = ['wasm'];
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const gpu = (navigator as any).gpu;
-    if (gpu) { const adapter = await gpu.requestAdapter(); if (adapter) eps = ['webgpu', 'wasm']; }
-  } catch { /* no WebGPU */ }
+  // Use WASM — WebGPU has incomplete operator support for these models
+  const eps: string[] = ['wasm'];
 
   const buf = await fetchWithCache(MODEL_URL, onProgress);
   onProgress?.('Initializing LaMa session...');
