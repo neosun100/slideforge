@@ -9,17 +9,22 @@ describe('Toast', () => {
   });
 
   it('calls onDismiss when dismiss clicked', () => {
+    vi.useFakeTimers();
     const onDismiss = vi.fn();
     render(<Toast message="err" onDismiss={onDismiss} />);
     fireEvent.click(screen.getByText('Dismiss'));
+    // onDismiss is delayed 300ms for fade-out animation
+    vi.advanceTimersByTime(400);
     expect(onDismiss).toHaveBeenCalled();
+    vi.useRealTimers();
   });
 
-  it('auto-dismisses after duration', async () => {
+  it('auto-dismisses after duration', () => {
     vi.useFakeTimers();
     const onDismiss = vi.fn();
     render(<Toast message="err" onDismiss={onDismiss} duration={1000} />);
-    vi.advanceTimersByTime(1100);
+    // duration + 300ms fade-out delay
+    vi.advanceTimersByTime(1400);
     expect(onDismiss).toHaveBeenCalled();
     vi.useRealTimers();
   });

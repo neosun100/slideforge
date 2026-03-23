@@ -38,9 +38,14 @@ export function DropZone({ onFile, onError }: Props) {
 
   return (
     <div
-      className={`w-full max-w-lg mx-auto p-10 border-2 border-dashed rounded-xl text-center cursor-pointer transition-all ${
-        dragOver ? 'border-[var(--accent)] bg-[var(--accent)]/5' : 'border-[var(--border)] bg-white/[0.02]'
-      }`}
+      className="w-full max-w-lg mx-auto p-10 rounded-xl text-center cursor-pointer glass"
+      style={{
+        borderRadius: 'var(--radius-xl)',
+        border: dragOver ? '2px solid var(--accent)' : '2px dashed var(--glass-border)',
+        boxShadow: dragOver ? 'var(--shadow-glow)' : 'none',
+        transition: 'var(--transition-base)',
+        background: dragOver ? 'rgba(100,108,255,0.06)' : 'var(--glass-bg)',
+      }}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}

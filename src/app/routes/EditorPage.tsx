@@ -37,22 +37,24 @@ function ConfigPanel({ onEngineChange, renderScaleRef, maxPagesRef }: { onEngine
   const updateScale = (v: number) => { setRenderScale(v); renderScaleRef.current = v; };
   const updatePages = (v: number) => { setMaxPages(v); maxPagesRef.current = v; };
 
+  const inputStyle = { background: 'var(--bg-floating)', color: 'var(--text)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)' };
+
   return (
-    <div className="w-full max-w-sm space-y-3 text-sm" style={{ color: 'var(--text-muted)' }}>
+    <div className="w-full max-w-sm space-y-3 text-sm glass p-4 rounded-xl" style={{ color: 'var(--text-muted)', borderRadius: 'var(--radius-lg)' }}>
       {/* Pages to load */}
       <div className="flex items-center justify-between">
         <span>Pages to load:</span>
         <div className="flex items-center gap-2">
           <input type="number" min={0} value={maxPages} onChange={e => updatePages(Math.max(0, +e.target.value))}
-            className="w-16 px-2 py-1 rounded text-center" style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }} />
-          <span className="text-xs opacity-60">{maxPages === 0 ? 'All pages' : `${maxPages} pages`}</span>
+            className="w-16 px-2 py-1 text-center" style={inputStyle} />
+          <span className="text-xs" style={{ color: 'var(--text-dim)' }}>{maxPages === 0 ? 'All pages' : `${maxPages} pages`}</span>
         </div>
       </div>
       {/* Render scale */}
       <div className="flex items-center justify-between">
         <span>Render scale:</span>
         <select value={renderScale} onChange={e => updateScale(+e.target.value)}
-          className="px-2 py-1 rounded" style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+          className="px-2 py-1" style={inputStyle}>
           <option value={1}>1x (native)</option>
           <option value={2}>2x</option>
           <option value={3}>3x</option>
@@ -64,11 +66,11 @@ function ConfigPanel({ onEngineChange, renderScaleRef, maxPagesRef }: { onEngine
         <span>OCR Engine:</span>
         <div className="flex items-center gap-2">
           <select value={engineId} onChange={e => { setEngineId(e.target.value); onEngineChange?.(); }}
-            className="px-2 py-1 rounded" style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+            className="px-2 py-1" style={inputStyle}>
             {engines.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
           </select>
           <span className="text-xs" style={{ color: engineReady ? '#4ade80' : '#facc15' }}>
-            {engineReady ? 'Ready' : (engineLoadProgress || 'Loading...')}
+            {engineReady ? 'Ready' : (engineLoadProgress || 'Downloading models...')}
           </span>
         </div>
       </div>
@@ -76,7 +78,7 @@ function ConfigPanel({ onEngineChange, renderScaleRef, maxPagesRef }: { onEngine
       <div className="flex items-center justify-between">
         <span>Merge mode:</span>
         <select value={mergeRowOnly ? 'row' : 'all'} onChange={() => toggleMergeRowOnly()}
-          className="px-2 py-1 rounded" style={{ background: 'var(--surface)', color: 'var(--text)', border: '1px solid var(--border)' }}>
+          className="px-2 py-1" style={inputStyle}>
           <option value="row">Same row only</option>
           <option value="all">All nearby</option>
         </select>

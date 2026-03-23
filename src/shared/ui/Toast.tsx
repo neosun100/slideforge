@@ -9,27 +9,41 @@ interface Props {
   duration?: number;
 }
 
-const colors: Record<ToastType, string> = {
-  error: 'bg-[var(--danger)]',
-  success: 'bg-[var(--success)]',
-  info: 'bg-[var(--accent)]',
-};
+const icons: Record<ToastType, string> = { error: '✕', success: '✓', info: 'ℹ' };
+const accents: Record<ToastType, string> = { error: 'var(--danger)', success: 'var(--success)', info: 'var(--accent)' };
 
 export function Toast({ message, type = 'error', onDismiss, duration = 5000 }: Props) {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
 
   useEffect(() => {
     if (duration <= 0) return;
-    const t = setTimeout(() => { setVisible(false); onDismiss(); }, duration);
+    const t = setTimeout(() => { setVisible(false); setTimeout(onDismiss, 300); }, duration);
     return () => clearTimeout(t);
   }, [duration, onDismiss]);
 
-  if (!visible) return null;
-
   return (
-    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 ${colors[type]} text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 z-[200] max-w-md`}>
-      <p className="text-sm flex-1">{message}</p>
-      <button onClick={onDismiss} className="text-xs border border-white/40 rounded px-2 py-0.5 bg-transparent text-white cursor-pointer hover:bg-white/10">
+    <div
+      className="fixed bottom-6 left-1/2 glass flex items-center gap-3 z-[200] max-w-md"
+      style={{
+        transform: visible ? 'translate(-50%, 0)' : 'translate(-50%, 20px)',
+        opacity: visible ? 1 : 0,
+        transition: 'all var(--transition-base)',
+        padding: '12px 20px',
+        borderRadius: 'var(--radius-md)',
+        borderLeft: `3px solid ${accents[type]}`,
+      }}
+    >
+      <span style={{ color: accents[type], fontWeight: 700, fontSize: '14px' }}>{icons[type]}</span>
+      <p className="text-sm flex-1" style={{ color: 'var(--text)' }}>{message}</p>
+      <button
+        onClick={() => { setVisible(false); setTimeout(onDismiss, 300); }}
+        className="text-xs rounded px-2 py-0.5 cursor-pointer"
+        style={{ background: 'var(--glass-bg)', color: 'var(--text-muted)', border: '1px solid var(--glass-border)', transition: 'var(--transition-fast)' }}
+        onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+      >
         Dismiss
       </button>
     </div>

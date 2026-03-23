@@ -1,34 +1,136 @@
 @import "tailwindcss";
 
+/* ─── v2.0 Design System ─── */
+
 :root {
-  --bg: #0f0f1a;
-  --surface: #1a1a2e;
-  --surface-2: #252535;
-  --border: #2a2a3e;
-  --text: #e0e0e0;
-  --text-muted: #888;
+  /* Depth layers */
+  --bg-primary: #08081a;
+  --bg-elevated: #111128;
+  --bg-floating: #1a1a36;
+  --bg-hover: #222244;
+
+  /* Glass tokens */
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-blur: 16px;
+  --glass-bg-hover: rgba(255,255,255,0.07);
+
+  /* Text */
+  --text: #e8e8f0;
+  --text-muted: #8888aa;
+  --text-dim: #555570;
+
+  /* Accent gradient */
   --accent: #646cff;
   --accent-hover: #535bf2;
-  --danger: #dc3545;
-  --success: #4caf50;
-  --warning: #ff9800;
+  --accent-glow: rgba(100,108,255,0.35);
+  --gradient-primary: linear-gradient(135deg, #00d4ff, #646cff, #a855f7);
+  --gradient-accent: linear-gradient(135deg, #646cff, #a855f7);
+  --gradient-text: linear-gradient(135deg, #00d4ff 0%, #646cff 50%, #a855f7 100%);
+
+  /* Semantic */
+  --danger: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+
+  /* Borders & Shadows */
+  --border: rgba(255,255,255,0.06);
+  --border-hover: rgba(255,255,255,0.12);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 30px var(--accent-glow);
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4,0,0.2,1);
+  --transition-base: 250ms cubic-bezier(0.4,0,0.2,1);
+  --transition-slow: 400ms cubic-bezier(0.4,0,0.2,1);
+
+  /* Legacy compat aliases */
+  --bg: var(--bg-primary);
+  --surface: var(--bg-elevated);
+  --surface-2: var(--bg-floating);
 }
 
 [data-theme="light"] {
-  --bg: #f5f5f7;
-  --surface: #ffffff;
-  --surface-2: #f0f0f2;
-  --border: #e0e0e0;
+  --bg-primary: #f0f0f8;
+  --bg-elevated: #ffffff;
+  --bg-floating: #f8f8fc;
+  --bg-hover: #ebebf5;
+  --glass-bg: rgba(255,255,255,0.6);
+  --glass-border: rgba(0,0,0,0.08);
+  --glass-bg-hover: rgba(255,255,255,0.8);
   --text: #1a1a2e;
-  --text-muted: #666;
+  --text-muted: #666680;
+  --text-dim: #9999aa;
+  --border: rgba(0,0,0,0.06);
+  --border-hover: rgba(0,0,0,0.12);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+  --accent-glow: rgba(100,108,255,0.15);
+  --shadow-glow: 0 0 30px rgba(100,108,255,0.15);
+  --bg: var(--bg-primary);
+  --surface: var(--bg-elevated);
+  --surface-2: var(--bg-floating);
 }
 
+/* ─── Base ─── */
+
 body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: var(--bg);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ─── Glass utility ─── */
+
+.glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+.glass-hover:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--border-hover);
+}
+
+/* ─── Gradient text utility ─── */
+
+.gradient-text {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ─── Smooth transitions on interactive elements ─── */
+
+a, button, input, select, details, summary {
+  transition: all var(--transition-fast);
+}
+
+/* ─── Scrollbar ─── */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ─── Selection ─── */
+
+::selection {
+  background: rgba(100,108,255,0.3);
+  color: var(--text);
+}

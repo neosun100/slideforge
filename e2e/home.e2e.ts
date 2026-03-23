@@ -19,7 +19,7 @@ test.describe('Home Page', () => {
 
   test('FAQ section is interactive', async ({ page }) => {
     await page.goto('/');
-    const faq = page.locator('details:has-text("Is SlideForge really free")');
+    const faq = page.locator('div:has-text("Is SlideForge really free")').first();
     await expect(faq).toBeVisible();
     await faq.click();
     await expect(page.locator('text=completely free')).toBeVisible();

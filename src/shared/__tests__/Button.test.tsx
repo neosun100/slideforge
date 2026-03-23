@@ -20,8 +20,9 @@ describe('Button', () => {
     expect(screen.getByText('No')).toBeDisabled();
   });
 
-  it('applies variant classes', () => {
+  it('applies variant styles', () => {
     const { container } = render(<Button variant="danger">Del</Button>);
-    expect(container.firstChild).toHaveClass('bg-[var(--danger)]');
+    const btn = container.firstChild as HTMLElement;
+    expect(btn.style.background).toBe('var(--danger)');
   });
 });
