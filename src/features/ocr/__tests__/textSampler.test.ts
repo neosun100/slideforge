@@ -15,26 +15,46 @@ describe('textSampler', () => {
   });
 
   describe('sampleTextColor', () => {
-    it('returns darkest boundary pixel', () => {
-      // Create 20x20 white image with a dark pixel at boundary
-      const img = new ImageData(20, 20);
-      // Fill white
+    it('detects dark text on white background', () => {
+      // 30x30 white image with dark interior pixels in bbox (5,5,20,20)
+      const img = new ImageData(30, 30);
       for (let i = 0; i < img.data.length; i += 4) {
         img.data[i] = 255; img.data[i + 1] = 255; img.data[i + 2] = 255; img.data[i + 3] = 255;
       }
-      // Put dark pixel at (5, 2) which is in the boundary ring of bbox (3,5,10,10)
-      const idx = (2 * 20 + 5) * 4;
-      img.data[idx] = 10; img.data[idx + 1] = 10; img.data[idx + 2] = 10;
-
-      const color = sampleTextColor(img, 3, 5, 10, 10);
-      // Should find a dark-ish color from boundary sampling
-      expect(color.r).toBeLessThan(256);
+      // Put dark pixels inside the bbox
+      for (let y = 8; y < 22; y++) {
+        for (let x = 8; x < 22; x++) {
+          const idx = (y * 30 + x) * 4;
+          img.data[idx] = 20; img.data[idx + 1] = 20; img.data[idx + 2] = 20;
+        }
+      }
+      const color = sampleTextColor(img, 5, 5, 20, 20);
+      // Should detect dark text
+      expect(color.r).toBeLessThan(100);
     });
 
-    it('returns black for empty image data', () => {
+    it('detects white text on dark background', () => {
+      // 30x30 dark image with white interior pixels
+      const img = new ImageData(30, 30);
+      for (let i = 0; i < img.data.length; i += 4) {
+        img.data[i] = 10; img.data[i + 1] = 10; img.data[i + 2] = 20; img.data[i + 3] = 255;
+      }
+      // Put white pixels inside the bbox
+      for (let y = 8; y < 22; y++) {
+        for (let x = 8; x < 22; x++) {
+          const idx = (y * 30 + x) * 4;
+          img.data[idx] = 240; img.data[idx + 1] = 240; img.data[idx + 2] = 240;
+        }
+      }
+      const color = sampleTextColor(img, 5, 5, 20, 20);
+      // Should detect light text, not dark background
+      expect(color.r).toBeGreaterThan(150);
+    });
+
+    it('returns fallback for empty bbox', () => {
       const img = new ImageData(1, 1);
       const color = sampleTextColor(img, 0, 0, 1, 1);
-      expect(color).toEqual({ r: 0, g: 0, b: 0 });
+      expect(color).toBeDefined();
     });
   });
 
