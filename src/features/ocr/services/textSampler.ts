@@ -1,66 +1,74 @@
 import type { RGB, BBox } from '@/shared/types';
-import { luminance } from '@/shared/utils/color';
 
 /** Estimate font size from bounding box height */
 export function estimateFontSize(height: number): number {
   return Math.max(8, Math.round(height * 0.85));
 }
 
-/** Sample text color by finding the dominant foreground color inside the bbox */
+/** Sample text color — matches original deckeditpro logic:
+ *  1. Sample boundary ring to get average background color + luminance
+ *  2. Sample 13 interior points near bbox center
+ *  3. Return the interior pixel most different from background luminance
+ */
 export function sampleTextColor(imageData: ImageData, x: number, y: number, w: number, h: number): RGB {
   const data = imageData.data;
   const imgW = imageData.width;
   const imgH = imageData.height;
 
-  // First, sample background from boundary ring
-  const bgSamples: RGB[] = [];
-  const ring = 3;
-  const sampleBg = (px: number, py: number) => {
+  function getPixel(px: number, py: number): RGB {
     const cx = Math.max(0, Math.min(imgW - 1, Math.round(px)));
     const cy = Math.max(0, Math.min(imgH - 1, Math.round(py)));
     const idx = (cy * imgW + cx) * 4;
-    bgSamples.push({ r: data[idx]!, g: data[idx + 1]!, b: data[idx + 2]! });
-  };
-  for (let i = 0; i <= 6; i++) {
-    const px = x + w * i / 6;
-    sampleBg(px, y - ring);
-    sampleBg(px, y + h + ring);
+    return { r: data[idx]!, g: data[idx + 1]!, b: data[idx + 2]! };
   }
-  let bgR = 0, bgG = 0, bgB = 0;
-  for (const s of bgSamples) { bgR += s.r; bgG += s.g; bgB += s.b; }
-  const n = bgSamples.length || 1;
-  const bg: RGB = { r: Math.round(bgR / n), g: Math.round(bgG / n), b: Math.round(bgB / n) };
-  const bgLum = luminance(bg);
 
-  // Then, sample interior pixels and find the one most different from background
-  const interior: { r: number; g: number; b: number; dist: number }[] = [];
-  const stepX = Math.max(1, Math.floor(w / 10));
-  const stepY = Math.max(1, Math.floor(h / 5));
-  for (let py = y + 1; py < y + h - 1; py += stepY) {
-    for (let px = x + 1; px < x + w - 1; px += stepX) {
-      const cx = Math.max(0, Math.min(imgW - 1, Math.round(px)));
-      const cy = Math.max(0, Math.min(imgH - 1, Math.round(py)));
-      const idx = (cy * imgW + cx) * 4;
-      const r = data[idx]!, g = data[idx + 1]!, b = data[idx + 2]!;
-      const lum = luminance({ r, g, b });
-      const dist = Math.abs(lum - bgLum);
-      interior.push({ r, g, b, dist });
+  function lum(c: RGB): number {
+    return c.r * 0.299 + c.g * 0.587 + c.b * 0.114;
+  }
+
+  // 1. Sample boundary ring (2px outside bbox)
+  const ring = 2;
+  const boundary: RGB[] = [];
+  const steps = 8;
+  for (let i = 0; i <= steps; i++) {
+    const px = x + w * i / steps;
+    boundary.push(getPixel(px, y - ring));
+    boundary.push(getPixel(px, y + h + ring));
+  }
+  for (let i = 1; i < steps; i++) {
+    const py = y + h * i / steps;
+    boundary.push(getPixel(x - ring, py));
+    boundary.push(getPixel(x + w + ring, py));
+  }
+
+  // 2. Average boundary → background color + luminance
+  let bgR = 0, bgG = 0, bgB = 0;
+  for (const p of boundary) { bgR += p.r; bgG += p.g; bgB += p.b; }
+  const n = boundary.length;
+  const bgLum = lum({ r: Math.round(bgR / n), g: Math.round(bgG / n), b: Math.round(bgB / n) });
+
+  // 3. Sample 13 interior points near center
+  const cx = Math.round(x + w / 2);
+  const cy = Math.round(y + h / 2);
+  const offsets: [number, number][] = [
+    [0, 0], [-2, -2], [2, -2], [-2, 2], [2, 2],
+    [-4, 0], [4, 0], [0, -4], [0, 4],
+    [Math.round(-w * 0.25), 0], [Math.round(w * 0.25), 0],
+    [0, Math.round(-h * 0.25)], [0, Math.round(h * 0.25)],
+  ];
+
+  // 4. Pick the pixel most different from background luminance
+  let bestR = 0, bestG = 0, bestB = 0, bestDist = -1;
+  for (const [dx, dy] of offsets) {
+    const p = getPixel(cx + dx, cy + dy);
+    const dist = Math.abs(lum(p) - bgLum);
+    if (dist > bestDist) {
+      bestDist = dist;
+      bestR = p.r; bestG = p.g; bestB = p.b;
     }
   }
 
-  if (interior.length === 0) {
-    // Fallback: if bg is dark, text is white; if bg is light, text is black
-    return bgLum < 0.5 ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
-  }
-
-  // Sort by distance from background, take top 30% most different pixels
-  interior.sort((a, b) => b.dist - a.dist);
-  const topN = Math.max(1, Math.floor(interior.length * 0.3));
-  let rSum = 0, gSum = 0, bSum = 0;
-  for (let i = 0; i < topN; i++) {
-    rSum += interior[i]!.r; gSum += interior[i]!.g; bSum += interior[i]!.b;
-  }
-  return { r: Math.round(rSum / topN), g: Math.round(gSum / topN), b: Math.round(bSum / topN) };
+  return { r: bestR, g: bestG, b: bestB };
 }
 
 /** Sample background color from boundary pixels */
