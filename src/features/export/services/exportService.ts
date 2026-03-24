@@ -1,6 +1,6 @@
 import PptxGenJS from 'pptxgenjs';
 import { createLogger } from '@/shared/utils/logger';
-import { pxToInches, pxToPoints, rgbToPptxHex } from './pptxBuilder';
+import { rgbToPptxHex } from './pptxBuilder';
 import { laplaceInpaint } from '@/features/inpaint/services/laplaceInpaint';
 import type { TextRegion, ErasedRegion, ExportOptions } from '@/shared/types';
 
@@ -49,15 +49,28 @@ export async function exportToPPTX(
       w: '100%', h: '100%',
     });
 
+    // Scale factors: map pixel coords to slide inches proportionally
+    const imgW = slideData.imageData.width;
+    const imgH = slideData.imageData.height;
+    const sx = options.width / imgW;   // inches per pixel (horizontal)
+    const sy = options.height / imgH;  // inches per pixel (vertical)
+
     // Text boxes
     for (const region of slideData.textRegions) {
       const bb = region.boundingBox;
+      const xIn = bb.x * sx;
+      const yIn = bb.y * sy;
+      const wIn = bb.width * sx;
+      const hIn = bb.height * sy;
+      // Font size: derive from box height in inches → points (1 inch = 72pt)
+      const fontPt = Math.max(6, Math.round(hIn * 72 * 0.85));
+
       slide.addText(region.text, {
-        x: pxToInches(bb.x),
-        y: pxToInches(bb.y),
-        w: pxToInches(bb.width),
-        h: pxToInches(bb.height),
-        fontSize: pxToPoints(region.fontSize),
+        x: xIn,
+        y: yIn,
+        w: wIn,
+        h: hIn,
+        fontSize: fontPt,
         color: rgbToPptxHex(region.textColor),
         fontFace: 'Arial',
         valign: 'middle',
